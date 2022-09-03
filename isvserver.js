@@ -19,7 +19,9 @@ app.get('/randomProduct', async (req, res) => {
     res.json(randomProduct)
 });
 
-const server = app.listen(8080, () => {
+const PORT = 8080;
+
+const server = app.listen(PORT, () => {
     console.log(`Servidor inicializado en el puerto ${server.address().port}`)
 });
 server.on("error", err => console.log(`Error en el servidor: ${err}`));

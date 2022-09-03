@@ -1,5 +1,22 @@
 {
   "dependencies": {
     "express": "^4.17.3"
-  }
+  },
+  "name": "isv-server-2",
+  "version": "1.0.0",
+  "main": "isvserver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignacioveigagiusti/isv-server-2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ignacioveigagiusti/isv-server-2/issues"
+  },
+  "homepage": "https://github.com/ignacioveigagiusti/isv-server-2#readme",
+  "description": ""
 }
