@@ -19,7 +19,7 @@ app.get('/randomProduct', async (req, res) => {
     res.json(randomProduct)
 });
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
 const server = app.listen(PORT, () => {
     console.log(`Servidor inicializado en el puerto ${server.address().port}`)
