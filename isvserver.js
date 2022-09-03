@@ -14,6 +14,7 @@ const productContainer = new Products('./api/products.json');
 productRouter.use(express.json());
 productRouter.use(express.urlencoded({ extended: true }));
 productRouter.use(bodyParser.urlencoded({ extended: false }));
+app.use(methodOverride('_method'))
 productRouter.use(methodOverride('_method'))
 
 // public/index.html is sent when performing a get on the root directory
@@ -65,7 +66,7 @@ productRouter.post('/', async (req, res) => {
 productRouter.put('/', (req,res) => {
     try {
         let putId = req.body.id;
-        res.redirect(307, `/${putId}?_method=PUT`)
+        res.redirect(307, `products/${putId}?_method=PUT`)
     } catch (err) {
         res.send(`${err}`);
     }
@@ -81,13 +82,12 @@ productRouter.put('/:id', async (req, res) => {
         if (typeof req.body.title === 'string' && req.body.title !== '') {
             newTitle = req.body.title;
         }
-        if (req.body.title != null) {
-            newPrice = req.body.price;
+        if (req.body.price != null) {
+            newPrice = parseFloat(req.body.price);
         }    
         if (typeof req.body.thumbnail === 'string' && req.body.thumbnail !== '') {   
             newThumbnail = req.body.thumbnail;
         }
-        newPrice = parseFloat(newPrice);
         const newProduct = {title:newTitle, price:newPrice, thumbnail:newThumbnail};
         await productContainer.edit(param, newProduct);
         res.json({id:param, ...newProduct});
