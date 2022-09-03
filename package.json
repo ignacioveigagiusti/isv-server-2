@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "express": "^4.17.3"
+    "body-parser": "^1.20.0",
+    "express": "^4.17.3",
+    "method-override": "^3.0.0"
   },
   "name": "isv-server-2",
   "version": "1.0.0",
