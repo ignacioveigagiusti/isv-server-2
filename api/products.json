@@ -28,5 +28,11 @@
     "title": "Another Product (test)",
     "price": 100,
     "thumbnail": "\"https://isvshop.netlify.app/assets/durlock.png\""
+  },
+  {
+    "id": 5,
+    "title": "asd",
+    "price": 100,
+    "thumbnail": "asd"
   }
 ]

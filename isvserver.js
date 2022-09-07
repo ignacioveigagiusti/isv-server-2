@@ -46,16 +46,19 @@ productRouter.get('/:id', async (req, res) => {
 // add one product with a post method to /api/products
 productRouter.post('/', async (req, res) => {
     try {
-        if( req.body.title == undefined || req.body.price === null || req.body.thumbnail == undefined || req.body.title == '' || req.body.price === '' || req.body.thumbnail == '' ) {
+        if( req.body.title == undefined || isNaN(req.body.price) || req.body.thumbnail == undefined || req.body.title == '' || req.body.price == '' || req.body.thumbnail == '' ) {
             throw 'Missing data. Product needs Title, Price and Thumbnail.'
         }
-            let title = req.body.title;
+        if( req.body.price < 0) {
+            throw 'Price must be equal to or greater than zero.'
+        }
+        let title = req.body.title;
         let price = req.body.price;
         let thumbnail = req.body.thumbnail;
         price = parseFloat(price);
         const newProduct = {title:title, price:price, thumbnail:thumbnail};
         const savedProduct = await productContainer.save(newProduct);
-        res.send(`Producto añadido: ${JSON.stringify(savedProduct)}`);
+        res.send(`Product added succesfully: ${JSON.stringify(savedProduct)}`);
     } catch (err) {
         res.send(`${err}`);
     }
@@ -75,6 +78,12 @@ productRouter.put('/', (req,res) => {
 // PUT method to edit a product by ID (this is the one that can be tested with postman)
 productRouter.put('/:id', async (req, res) => {
     try {
+        if( req.body.title == undefined || isNaN(req.body.price) || req.body.thumbnail == undefined || req.body.title == '' || req.body.price == '' ||  req.body.thumbnail == '' ) {
+            throw 'Missing data. Product needs Title, Price and Thumbnail.'
+        }
+        if( req.body.price < 0) {
+            throw 'Price must be equal to or greater than zero.'
+        }
         const param = req.params.id;
         let newTitle;
         let newPrice;
@@ -101,7 +110,7 @@ productRouter.delete('/:id', async (req, res) => {
     try {
         const param = req.params.id;
         await productContainer.deleteById(param);
-        res.send(`producto con id: ${param} eliminado exitosamente`);
+        res.send(`product with id: ${param} deleted succcessfully`);
     } catch (err) {
         res.send(`${err}`);
     }
@@ -113,6 +122,6 @@ app.use('/api/products', productRouter);
 //Connection
 const PORT = 8080;
 const server = app.listen(PORT, () => {
-    console.log(`Servidor inicializado en el puerto ${server.address().port}`)
+    console.log(`Initialized server on port ${server.address().port}`)
 });
-server.on("error", err => console.log(`Error en el servidor: ${err}`));
+server.on("error", err => console.log(`Server error: ${err}`));
