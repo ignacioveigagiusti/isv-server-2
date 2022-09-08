@@ -78,20 +78,21 @@ productRouter.put('/', (req,res) => {
 // PUT method to edit a product by ID (this is the one that can be tested with postman)
 productRouter.put('/:id', async (req, res) => {
     try {
-        if( req.body.title == undefined || isNaN(req.body.price) || req.body.thumbnail == undefined || req.body.title == '' || req.body.price == '' ||  req.body.thumbnail == '' ) {
-            throw 'Missing data. Product needs Title, Price and Thumbnail.'
-        }
-        if( req.body.price < 0) {
+        // if( req.body.title == undefined || isNaN(req.body.price) || req.body.thumbnail == undefined || req.body.title == '' || req.body.price == '' ||  req.body.thumbnail == '' ) {
+        //     throw 'Missing data. Product needs Title, Price and Thumbnail.'
+        // }
+        if(req.body.price && (req.body.price < 0 || isNaN(req.body.price))) {
             throw 'Price must be equal to or greater than zero.'
         }
         const param = req.params.id;
-        let newTitle;
-        let newPrice;
-        let newThumbnail;
+        const prevProduct = await productContainer.getById(param);
+        let newTitle = prevProduct.title;
+        let newPrice = prevProduct.price;
+        let newThumbnail = prevProduct.thumbnail;
         if (typeof req.body.title === 'string' && req.body.title !== '') {
             newTitle = req.body.title;
         }
-        if (req.body.price != null) {
+        if (req.body.price && req.body.price >= 0  ) {
             newPrice = parseFloat(req.body.price);
         }    
         if (typeof req.body.thumbnail === 'string' && req.body.thumbnail !== '') {   
