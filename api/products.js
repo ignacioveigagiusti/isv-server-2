@@ -32,8 +32,9 @@ class Products {
             const newProduct = {id: newID, ...product};
             let newContent = prevContent
             newContent.push(newProduct);
+            await newContent.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
             await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(newContent,null,2));
-            console.log('Succesful write!');
+            console.log('Escritura exitosa!');
             return newProduct;
         }
         catch(err){
@@ -59,7 +60,8 @@ class Products {
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID was not found';
             await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(prevContent,null,2));
-            console.log('Succesful write!');
+            console.log('Escritura exitosa!');
+            return { id: parseInt(productId), ...product}
         }
         catch(err){
             throw new Error(`${err}`)
@@ -117,7 +119,7 @@ class Products {
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID does not exist!';
             await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(newContent,null,2))
-            console.log('Succesful write!')
+            console.log('Escritura exitosa!')
         }
         catch(err){
             throw new Error(`${err}`)
@@ -127,7 +129,7 @@ class Products {
     async deleteAll() {
         try {
             await fs.promises.writeFile(`${this.fileToWork}`, '[]')
-            console.log('Succesful write!')
+            console.log('Escritura exitosa!')
         } catch (err) {
             throw new Error(`${err}`) 
         }
