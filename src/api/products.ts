@@ -1,6 +1,9 @@
-const fs = require('fs');
+import fs from 'fs';
 
 class Products {
+    
+    fileToWork: string;
+
     constructor(fileToWork){
         this.fileToWork = fileToWork
     }
@@ -13,7 +16,7 @@ class Products {
             }
             const prevContent = JSON.parse(getContent); 
             // Extract IDs into an array
-            let indexArray = [];
+            let indexArray: number[] = [];
             for (const i in prevContent) {
                 indexArray.push(prevContent[i].id);
             }
@@ -21,9 +24,9 @@ class Products {
             let newID = indexArray.length + 1;
             // Search for a missing ID in the ID Array. If a gap is found, the new ID will be set to that number
             if (indexArray.length > 0) {
-                indexArray = indexArray.sort((a,b) => a - b )
+                indexArray = indexArray.sort((a: any,b: any) => a - b )
                 for (let i = 0; i < indexArray.length; i++) {
-                    if ((indexArray[i]-i) != 1){
+                    if ( (indexArray[i] - i) != 1){
                         newID = i+1;
                         break
                     }
@@ -90,7 +93,7 @@ class Products {
 
     async getAll() {
         try{
-            const getContent = await fs.promises.readFile(`${this.fileToWork}`,);
+            const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf-8');
             const content = JSON.parse(getContent); 
             return content
         }
@@ -103,7 +106,7 @@ class Products {
         try{
             const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf-8');
             const prevContent = JSON.parse(getContent); 
-            const newContent = [];
+            const newContent: any[] = [];
             // Variable to check if the ID exists in the list
             let IDwasFound = 0;
             for (let i = 0; i < prevContent.length; i++) {
@@ -136,4 +139,4 @@ class Products {
     }
 }
 
-module.exports = Products
+export default Products;
