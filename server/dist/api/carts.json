@@ -96,30 +96,5 @@
         "subcategory": "programacion"
       }
     ]
-  },
-  {
-    "id": 2,
-    "timestamp": "Wed Oct 12 2022 02:29:30 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 3,
-    "timestamp": "Wed Oct 12 2022 02:30:07 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 4,
-    "timestamp": "Wed Oct 12 2022 02:35:18 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 5,
-    "timestamp": "Wed Oct 12 2022 02:35:29 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 6,
-    "timestamp": "Wed Oct 12 2022 02:35:49 GMT-0300",
-    "products": []
   }
 ]
