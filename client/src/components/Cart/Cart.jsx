@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { addDoc, collection, doc, documentId, getFirestore, query, updateDoc, where, getDocs } from 'firebase/firestore'
 import { Link } from 'react-router-dom';
 import { useCartContext } from '../../context/CartContext';
 import styles from './cart.module.css';
@@ -12,10 +11,6 @@ export default function Cart() {
   const [orderId, setOrderId] = useState('');
   const [success, setSuccess] = useState(false);
   const { cartList, clearCart, totalPrice, setTotalPrice, priceSum } = useCartContext();
-  
-  const db = getFirestore();
-  const orderCollection = collection(db, 'orders');
-  const itemCollection = collection(db, 'items')
 
   function preventDefault(e){
     e.preventDefault();
@@ -34,6 +29,7 @@ export default function Cart() {
         .then(res => querySnapshotArray.push(res))
         .catch(err => alert("Ha habido un error al buscar los productos!"))
       } 
+      console.log(querySnapshotArray)
       for (let docum of querySnapshotArray) {
         let [itemInCart] = cartList.filter(i => i.id === docum.id)
         if (itemInCart.quantity > docum.stock) {
@@ -69,11 +65,21 @@ export default function Cart() {
       let order = {};
       order.buyer = {name: buyerName, phone: Number(buyerPhoneNumber), email: buyerEmail};
       order.items = [];
-      cartList.map(i => order.items.push({id: i.id, name: i.name, price: i.price, quantity: i.quantity}));
+      
+      const querySnapshot = []
+      for (let j of cartList.map(i => i.id)) {
+        fetch(`http://localhost:8080/api/products/${j}`, {
+                    method: 'GET'
+        }).then(res => res.json())
+        .then(res => querySnapshot.push(res))
+        .catch(err => alert("Ha habido un error al buscar los productos!"))
+      }
+
       order.total = totalPrice;
+      console.log(querySnapshot)
       await fetch(`http://localhost:8080/api/cart`, {
         method: 'POST',
-        body: JSON.stringify({products: order.items})
+        body: {products: querySnapshot}
       }).then(res => res.json())
       .then(docRef => {
         setOrderId(docRef.id);
@@ -83,19 +89,12 @@ export default function Cart() {
       setSuccess(true);
 
       //Stock update
-      const querySnapshot = []
-      for (let j of cartList.map(i => i.id)) {
-        fetch(`http://localhost:8080/api/products/${j}`, {
-                    method: 'GET'
-        }).then(res => res.json())
-        .then(res => querySnapshot.push(res))
-        .catch(err => alert("Ha habido un error al buscar los productos!"))
-      } 
+
       querySnapshot.forEach((docum) => {
-        let [itemInOrder] = order.items.filter(i => i.id === docum.id)
+        let itemInOrder = querySnapshot.filter(i => i.id === docum.id)
         //Update stock unless it is a service
         if (docum.cat !== 'servicios'){
-          let newStock = docum.data().stock - itemInOrder.quantity
+          let newStock = docum.stock - itemInOrder.quantity
           fetch(`http://localhost:8080/api/products/${docum.id}`, {
             method: 'PUT',
             body: JSON.stringify({stock: newStock})

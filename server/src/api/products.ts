@@ -57,14 +57,14 @@ class Products {
             for (const i in prevContent) {
                 if (prevContent[i].id == productId) {
                     IDwasFound = 1;
-                    prevContent[i] = { id: parseInt(productId), ...product};
+                    prevContent[i] = { id: productId.toString(), ...product};
                 }
             }
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID was not found';
             await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(prevContent,null,2));
             console.log('Escritura exitosa!');
-            return { id: parseInt(productId), ...product}
+            return { id: productId.toString(), ...product}
         }
         catch(err){
             throw new Error(`${err}`)

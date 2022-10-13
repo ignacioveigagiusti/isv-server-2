@@ -85,16 +85,16 @@ app.post('/edit',isAdmin, async (req, res) => {
         let newStock = prevProduct.stock;
         let newThumbnail = prevProduct.thumbnail;
         if (typeof req.body.category === 'string' && req.body.category !== '') {
-            newCategory = req.body.category;
+            newCategory = req.body.category.toString();
         }
         if (typeof req.body.subcategory === 'string' && req.body.subcategory !== '') {
-            newSubcategory = req.body.subcategory;
+            newSubcategory = req.body.subcategory.toString();
         }
         if (typeof req.body.title === 'string' && req.body.title !== '') {
-            newTitle = req.body.title;
+            newTitle = req.body.title.toString();
         }
         if (typeof req.body.description === 'string' && req.body.description !== '') {
-            newDescription = req.body.description;
+            newDescription = req.body.description.toString();
         }
         if (!isNaN(req.body.price) && req.body.price && req.body.price !== '') {
             newPrice = parseFloat(req.body.price);
@@ -103,11 +103,11 @@ app.post('/edit',isAdmin, async (req, res) => {
             newStock = parseInt(req.body.stock);
         }      
         if (typeof req.body.thumbnail === 'string' && req.body.thumbnail !== '') {   
-            newThumbnail = req.body.thumbnail;
+            newThumbnail = req.body.thumbnail.toString();
         }
         if(newPrice<=0 || newStock<0) throw 'Error 400: Price and stock must be positive numbers'
         const newProduct = { timestamp:newTimestamp, category:newCategory, subcategory:newSubcategory, title:newTitle, description:newDescription, price:newPrice, stock:newStock, thumbnail:newThumbnail};
-        const editProduct = await productContainer.edit(putId, newProduct).catch((err) => {
+        const editProduct = await productContainer.edit(putId.toString(), newProduct).catch((err) => {
             throw err
         });
         res.send(editProduct);
@@ -167,6 +167,9 @@ productRouter.post('/',isAdmin, async (req, res) => {
 productRouter.put('/:id',isAdmin, async (req, res) => {
     try {
         if( !admin ) throw 'Admin authentication needed';
+        if(req.body.price && (req.body.price < 0 || isNaN(req.body.price))) {
+            throw 'Price must be equal to or greater than zero.'
+        }
         const param = req.params.id;
         const prevProduct = await productContainer.getById(param);
         let newTimestamp = String(new Date()).slice(0,33);
@@ -178,30 +181,30 @@ productRouter.put('/:id',isAdmin, async (req, res) => {
         let newStock = prevProduct.stock;
         let newThumbnail = prevProduct.thumbnail;
         if (typeof req.body.category === 'string' && req.body.category !== '') {
-            newCategory = req.body.category;
+            newCategory = req.body.category.toString();
         }
         if (typeof req.body.subcategory === 'string' && req.body.subcategory !== '') {
-            newSubcategory = req.body.subcategory;
+            newSubcategory = req.body.subcategory.toString();
         }
         if (typeof req.body.title === 'string' && req.body.title !== '') {
-            newTitle = req.body.title;
+            newTitle = req.body.title.toString();
         }
         if (typeof req.body.description === 'string' && req.body.description !== '') {
-            newDescription = req.body.description;
+            newDescription = req.body.description.toString();
         }
-        if (parseFloat(req.body.price) != null && req.body.price !== '') {
+        if (req.body.price && parseFloat(req.body.price) != null && req.body.price !== '') {
             newPrice = parseFloat(req.body.price);
         }
-        if (parseFloat(req.body.stock) != null && req.body.stock !== '') {
+        if (req.body.stock && parseFloat(req.body.stock) != null && req.body.stock !== '') {
             newStock = parseInt(req.body.stock);
         }      
         if (typeof req.body.thumbnail === 'string' && req.body.thumbnail !== '') {   
-            newThumbnail = req.body.thumbnail;
+            newThumbnail = req.body.thumbnail.toString();
         }
         if(newPrice<=0 || newStock<0) throw 'Error 400: Price and stock must be positive numbers'
         const newProduct = { timestamp:newTimestamp, category:newCategory, subcategory:newSubcategory, title:newTitle, description:newDescription, price:newPrice, stock:newStock, thumbnail:newThumbnail};
         await productContainer.edit(param, newProduct);
-        res.json({id:param, ...newProduct});
+        res.json({id:param.toString(), ...newProduct});
     } catch (err) {
         res.status(400).send(`${err}`);
     }

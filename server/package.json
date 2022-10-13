@@ -13,12 +13,12 @@
   },
   "name": "isv-server",
   "version": "1.0.0",
-  "main": "dist/isvserver.js",
+  "main": "dist/isvserver.cjs",
   "type": "module",
   "scripts": {
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ."
+    "start": "node dist/isvserver.cjs"
   },
   "repository": {
     "type": "git",
