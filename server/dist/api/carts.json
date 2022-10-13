@@ -96,40 +96,5 @@
         "subcategory": "programacion"
       }
     ]
-  },
-  {
-    "id": 2,
-    "timestamp": "Thu Oct 13 2022 01:49:45 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 3,
-    "timestamp": "Thu Oct 13 2022 01:51:31 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 4,
-    "timestamp": "Thu Oct 13 2022 01:55:49 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 5,
-    "timestamp": "Thu Oct 13 2022 01:58:55 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 6,
-    "timestamp": "Thu Oct 13 2022 01:59:28 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 7,
-    "timestamp": "Thu Oct 13 2022 02:01:37 GMT-0300",
-    "products": []
-  },
-  {
-    "id": 8,
-    "timestamp": "Thu Oct 13 2022 02:02:45 GMT-0300",
-    "products": []
   }
 ]
