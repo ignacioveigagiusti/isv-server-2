@@ -1,6 +1,6 @@
 [
   {
-      "id": "1",
+      "id": 1,
       "timestamp": "Thu Apr 14 2022 00:10:38 GMT-0300",
       "stock": 9,
       "cat": "productos",
@@ -11,7 +11,7 @@
       "category": "Productos"
   },
   {
-      "id": "2",
+      "id": 2,
       "timestamp": "Thu Apr 14 2022 00:10:38 GMT-0300",
       "price": 450,
       "thumbnail": "https://isvcommerce.netlify.app/assets/acustiverP.png",
@@ -22,7 +22,7 @@
       "stock": 8
   },
   {
-      "id": "3",
+      "id": 3,
       "timestamp": "Thu Apr 14 2022 00:10:38 GMT-0300",
       "description": "Placas de yeso, solución estándar para renovar o construir paredes, cielorrasos y revestimientos interiores en ambientes secos, como dormitorios, oficinas, locales comerciales, etc.",
       "cat": "productos",
@@ -33,7 +33,7 @@
       "thumbnail": "https://isvcommerce.netlify.app/assets/durlock.png"
   },
   {
-      "id": "4",
+      "id": 4,
       "timestamp": "Thu Apr 14 2022 00:10:38 GMT-0300",
       "description": "Vidrio laminado con placa interior de PVB. Aislamiento térmico y acústico para ventanas y puertas, con la posibilidad de utilizarse en arreglos de doble vidriado con cámara de aire para un aislamiento aún mayor.",
       "price": 10000,
@@ -44,7 +44,7 @@
       "thumbnail": "https://isvcommerce.netlify.app/assets/glass.png"
   },
   {
-      "id": "5",
+      "id": 5,
       "timestamp": "Thu Apr 14 2022 00:10:38 GMT-0300",
       "subcategory": "instalacion",
       "cat": "servicios",
@@ -56,7 +56,7 @@
       "category": "Servicios"
   },
   {
-      "id": "6",
+      "id": 6,
       "timestamp": "Thu Apr 14 2022 00:10:38 GMT-0300",
       "thumbnail": "https://isvcommerce.netlify.app/assets/aislamiento.png",
       "category": "Servicios",
@@ -68,7 +68,7 @@
       "description": "Instalación de soluciones constructivas con fines primordialmente acústicos."
   },
   {
-      "id": "7",
+      "id": 7,
       "timestamp": "Thu Apr 14 2022 00:10:38 GMT-0300",
       "cat": "servicios",
       "stock": 1,
@@ -80,7 +80,7 @@
       "thumbnail": "https://isvcommerce.netlify.app/assets/absorcion.png"
   },
   {
-      "id": "8",
+      "id": 8,
       "timestamp": "Thu Apr 14 2022 00:10:38 GMT-0300",
       "description": "Programación de aplicaciones con fines ingenieriles relacionados al ámbito de la acústica. Lenguajes: MATLAB, Python, R, posibilidad de desarrollo de app web (MERN Stack).",
       "thumbnail": "https://isvcommerce.netlify.app/assets/logoISV.png",

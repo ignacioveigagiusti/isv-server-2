@@ -1,5 +1,17 @@
 import fs from 'fs';
 
+interface Prod {
+    id: number,
+    timestamp: string,
+    stock: number,
+    cat: string,
+    description: string,
+    price: number,
+    name: string,
+    thumbnail: string,
+    category: string
+}
+
 class Products {
     
     fileToWork: string;
@@ -21,7 +33,7 @@ class Products {
                 indexArray.push(prevContent[i].id);
             }
             // By default, the new ID is the number of current IDs + 1
-            let newID = indexArray.length + 1;
+            let newID: number = indexArray.length + 1;
             // Search for a missing ID in the ID Array. If a gap is found, the new ID will be set to that number
             if (indexArray.length > 0) {
                 indexArray = indexArray.sort((a: any,b: any) => a - b )
@@ -32,10 +44,10 @@ class Products {
                     }
                 }
             }
-            const newProduct = {id: newID.toString(), ...product};
+            const newProduct: Prod = {id: newID, ...product};
             let newContent = prevContent
             newContent.push(newProduct);
-            await newContent.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
+            await newContent.sort((a: { id: number; },b: { id: number; }) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
             await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(newContent,null,2));
             console.log('Escritura exitosa!');
             return newProduct;
@@ -45,7 +57,7 @@ class Products {
         }
     }
 
-    async edit(productId, product) {
+    async edit(productId: number, product) {
         try{
             let getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf8');
             if (getContent == '') {
@@ -57,7 +69,7 @@ class Products {
             for (const i in prevContent) {
                 if (prevContent[i].id == productId) {
                     IDwasFound = 1;
-                    prevContent[i] = { id: productId.toString(), ...product};
+                    prevContent[i] = { id: productId, ...product};
                 }
             }
             // Throw error if ID was not found
@@ -71,7 +83,7 @@ class Products {
         }
     }
 
-    async getById(num) {
+    async getById(num: number) {
         try{
             const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf8');
             const content = JSON.parse(getContent); 
@@ -102,7 +114,7 @@ class Products {
         }
     }
 
-    async deleteById(num: string) {
+    async deleteById(num: number) {
         try{
             const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf-8');
             const prevContent = JSON.parse(getContent); 

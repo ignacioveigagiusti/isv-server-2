@@ -42,14 +42,14 @@ cartRouter.use(express.urlencoded({ extended: false }));
 
 app.post('/',isAdmin, async (req, res) => {
     try {
-        if( req.body.title == undefined || req.body.price === null || req.body.thumbnail == undefined || req.body.category == undefined || req.body.stock == null || req.body.title == '' || req.body.price === '' || req.body.thumbnail == '' || req.body.category == '' || req.body.stock == '' ) {
-            throw 'Missing data. Product needs Title, Price, Thumbnail, Category and Stock.'
+        if( req.body.name == undefined || req.body.price === null || req.body.thumbnail == undefined || req.body.category == undefined || req.body.stock == null || req.body.name == '' || req.body.price === '' || req.body.thumbnail == '' || req.body.category == '' || req.body.stock == '' ) {
+            throw 'Missing data. Product needs Name, Price, Thumbnail, Category and Stock.'
         }
         if( !admin ) throw 'Admin authentication needed';
         let timestamp = String(new Date()).slice(0,33);
         let category = req.body.category;
         let subcategory = req.body.subcategory || ' ';
-        let title = req.body.title;
+        let name = req.body.name;
         let description = req.body.description || ' ';
         let price = req.body.price;
         let stock = req.body.stock;
@@ -57,7 +57,7 @@ app.post('/',isAdmin, async (req, res) => {
         price = parseFloat(price);
         stock = parseInt(stock);
         if(price<=0 || stock<0) throw 'Error 400: Price and stock must be positive numbers'
-        const newProduct = { timestamp:timestamp, category:category, subcategory:subcategory, title:title, description:description, price:price, stock:stock, thumbnail:thumbnail};
+        const newProduct = { timestamp:timestamp, category:category, subcategory:subcategory, name:name, description:description, price:price, stock:stock, thumbnail:thumbnail};
         const savedProduct = await productContainer.save(newProduct);
         res.send(JSON.stringify(savedProduct));
     } catch (err) {
@@ -67,7 +67,7 @@ app.post('/',isAdmin, async (req, res) => {
 
 app.post('/edit',isAdmin, async (req, res) => {
     try {
-        let putId;
+        let putId: number;
         if (req.body.id != null && req.body.id !== '') {
             putId = req.body.id;
         }
@@ -79,7 +79,7 @@ app.post('/edit',isAdmin, async (req, res) => {
         let newTimestamp = String(new Date()).slice(0,33);
         let newCategory = prevProduct.category;
         let newSubcategory = prevProduct.subcategory;
-        let newTitle = prevProduct.title;
+        let newName = prevProduct.name;
         let newDescription = prevProduct.description;
         let newPrice = prevProduct.price;
         let newStock = prevProduct.stock;
@@ -90,8 +90,8 @@ app.post('/edit',isAdmin, async (req, res) => {
         if (typeof req.body.subcategory === 'string' && req.body.subcategory !== '') {
             newSubcategory = req.body.subcategory.toString();
         }
-        if (typeof req.body.title === 'string' && req.body.title !== '') {
-            newTitle = req.body.title.toString();
+        if (typeof req.body.name === 'string' && req.body.name !== '') {
+            newName = req.body.name.toString();
         }
         if (typeof req.body.description === 'string' && req.body.description !== '') {
             newDescription = req.body.description.toString();
@@ -106,8 +106,8 @@ app.post('/edit',isAdmin, async (req, res) => {
             newThumbnail = req.body.thumbnail.toString();
         }
         if(newPrice<=0 || newStock<0) throw 'Error 400: Price and stock must be positive numbers'
-        const newProduct = { timestamp:newTimestamp, category:newCategory, subcategory:newSubcategory, title:newTitle, description:newDescription, price:newPrice, stock:newStock, thumbnail:newThumbnail};
-        const editProduct = await productContainer.edit(putId.toString(), newProduct).catch((err) => {
+        const newProduct = { timestamp:newTimestamp, category:newCategory, subcategory:newSubcategory, name:newName, description:newDescription, price:newPrice, stock:newStock, thumbnail:newThumbnail};
+        const editProduct = await productContainer.edit(putId, newProduct).catch((err) => {
             throw err
         });
         res.send(editProduct);
@@ -129,7 +129,7 @@ productRouter.get('/', async (req, res) => {
 // get one product by id from /api/products/:id
 productRouter.get('/:id', async (req, res) => {
     try {
-        const param = req.params.id;
+        const param = Number(req.params.id);
         const product = await productContainer.getById(param);
         res.json(product);
     } catch (err) {
@@ -140,14 +140,14 @@ productRouter.get('/:id', async (req, res) => {
 // add one product with a post method to /api/products
 productRouter.post('/',isAdmin, async (req, res) => {
     try {
-        if( req.body.title == undefined || req.body.price === null || req.body.thumbnail == undefined || req.body.category == undefined || req.body.stock == null || req.body.title == '' || req.body.price === '' || req.body.thumbnail == '' || req.body.category == '' || req.body.stock == '' ) {
-            throw 'Missing data. Product needs Title, Price, Thumbnail, Category and Stock.'
+        if( req.body.name == undefined || req.body.price === null || req.body.thumbnail == undefined || req.body.category == undefined || req.body.stock == null || req.body.name == '' || req.body.price === '' || req.body.thumbnail == '' || req.body.category == '' || req.body.stock == '' ) {
+            throw 'Missing data. Product needs Name, Price, Thumbnail, Category and Stock.'
         }
         if( !admin ) throw 'Admin authentication needed';
         let timestamp = String(new Date()).slice(0,33);
         let category = req.body.category;
         let subcategory = req.body.subcategory || ' ';
-        let title = req.body.title;
+        let name = req.body.name;
         let description = req.body.description || ' ';
         let price = req.body.price;
         let stock = req.body.stock;
@@ -155,7 +155,7 @@ productRouter.post('/',isAdmin, async (req, res) => {
         price = parseFloat(price);
         stock = parseInt(stock);
         if(price<=0 || stock<0) throw 'Error 400: Price and stock must be positive numbers'
-        const newProduct = { timestamp:timestamp, category:category, subcategory:subcategory, title:title, description:description, price:price, stock:stock, thumbnail:thumbnail};
+        const newProduct = { timestamp:timestamp, category:category, subcategory:subcategory, name:name, description:description, price:price, stock:stock, thumbnail:thumbnail};
         const savedProduct = await productContainer.save(newProduct);
         res.send(`Producto añadido: ${JSON.stringify(savedProduct)}`);
     } catch (err) {
@@ -170,12 +170,12 @@ productRouter.put('/:id',isAdmin, async (req, res) => {
         if(req.body.price && (req.body.price < 0 || isNaN(req.body.price))) {
             throw 'Price must be equal to or greater than zero.'
         }
-        const param = req.params.id;
+        const param = Number(req.params.id);
         const prevProduct = await productContainer.getById(param);
         let newTimestamp = String(new Date()).slice(0,33);
         let newCategory = prevProduct.category;
         let newSubcategory = prevProduct.subcategory || '';
-        let newTitle = prevProduct.title;
+        let newName = prevProduct.name;
         let newDescription = prevProduct.description || '';
         let newPrice = prevProduct.price;
         let newStock = prevProduct.stock;
@@ -186,8 +186,8 @@ productRouter.put('/:id',isAdmin, async (req, res) => {
         if (typeof req.body.subcategory === 'string' && req.body.subcategory !== '') {
             newSubcategory = req.body.subcategory.toString();
         }
-        if (typeof req.body.title === 'string' && req.body.title !== '') {
-            newTitle = req.body.title.toString();
+        if (typeof req.body.name === 'string' && req.body.name !== '') {
+            newName = req.body.name.toString();
         }
         if (typeof req.body.description === 'string' && req.body.description !== '') {
             newDescription = req.body.description.toString();
@@ -202,7 +202,7 @@ productRouter.put('/:id',isAdmin, async (req, res) => {
             newThumbnail = req.body.thumbnail.toString();
         }
         if(newPrice<=0 || newStock<0) throw 'Error 400: Price and stock must be positive numbers'
-        const newProduct = { timestamp:newTimestamp, category:newCategory, subcategory:newSubcategory, title:newTitle, description:newDescription, price:newPrice, stock:newStock, thumbnail:newThumbnail};
+        const newProduct = { timestamp:newTimestamp, category:newCategory, subcategory:newSubcategory, name:newName, description:newDescription, price:newPrice, stock:newStock, thumbnail:newThumbnail};
         await productContainer.edit(param, newProduct);
         res.json({id:param.toString(), ...newProduct});
     } catch (err) {
@@ -214,7 +214,7 @@ productRouter.put('/:id',isAdmin, async (req, res) => {
 productRouter.delete('/:id',isAdmin, async (req, res) => {
     try {
         if( !admin ) throw 'Admin authentication needed';
-        const param = req.params.id;
+        const param = Number(req.params.id);
         await productContainer.deleteById(param);
         res.send(`producto con id: ${param} eliminado exitosamente`);
     } catch (err) {
@@ -236,7 +236,7 @@ cartRouter.get('/', async (req,res) => {
 // get one cart by id from /api/cart/:id/products
 cartRouter.get('/:id/products', async (req, res) => {
     try {
-        const param = req.params.id;
+        const param = Number(req.params.id);
         const cart = await cartContainer.getById(param);
         res.json(cart);
     } catch (err) {
@@ -262,7 +262,7 @@ cartRouter.post('/', async (req, res) => {
 // Delete a cart by ID
 cartRouter.delete('/:id', async (req, res) => {
     try {
-        const param = req.params.id;
+        const param = Number(req.params.id);
         await cartContainer.deleteById(param);
         res.send(`carrito con id: ${param} eliminado exitosamente`);
     } catch (err) {
@@ -273,12 +273,13 @@ cartRouter.delete('/:id', async (req, res) => {
 // Add product to cart
 cartRouter.post('/:id/products/:prod_id', async (req, res) => {
     try {
-        const cartID = req.params.id;
-        const prodID = req.params.prod_id;
+        const cartID = Number(req.params.id);
+        const prodID = Number(req.params.prod_id);
         let cart = await cartContainer.getById(cartID);
         let product = await productContainer.getById(prodID);
-        cart.products.push(product);
-        let editedCart = await cartContainer.edit(cart);
+        let quantity: number = req.body.quantity || 1;
+        cart.products.push({...product, quantity: quantity}); // TO DO: Implement function that looks for existing products and modifies quantities in cart instead of adding new ones.
+        let editedCart = await cartContainer.edit(cartID, cart);
         res.json(editedCart);
     } catch (err) {
         res.status(400).send(`${err}`);
@@ -288,13 +289,13 @@ cartRouter.post('/:id/products/:prod_id', async (req, res) => {
 // Remove product from cart
 cartRouter.delete('/:id/products/:prod_id', async (req, res) => {
     try {
-        const cartId = req.params.id;
-        const prodId = req.params.prod_id;
-        let cart = await cartContainer.getById(cartId);
-        let removeIndex = cart.products.map(product => product.id).indexOf(prodId);
+        const cartID = Number(req.params.id);
+        const prodID = Number(req.params.prod_id);
+        let cart = await cartContainer.getById(cartID);
+        let removeIndex = cart.products.map(product => product.id).indexOf(prodID);
         if ( removeIndex < 0) throw 'Product not found in cart'
         ~removeIndex && cart.products.splice(removeIndex, 1);
-        let editedCart = await cartContainer.edit(cart);
+        let editedCart = await cartContainer.edit(cartID, cart);
         res.json(editedCart);
     } catch (err) {
         res.status(404).send(`${err}`);
