@@ -78,7 +78,8 @@ export default function Cart() {
       console.log(querySnapshot)
       await fetch(`http://localhost:8080/api/cart`, {
         method: 'POST',
-        body: {products: querySnapshot}
+        body: {products: querySnapshot},
+        headers: {'Content-Type': 'application/json'}
       }).then(res => res.json())
       .then(docRef => {
         setOrderId(docRef.id);
@@ -96,7 +97,8 @@ export default function Cart() {
           let newStock = i.stock - itemInOrder.quantity
           fetch(`http://localhost:8080/api/products/${i.id}`, {
             method: 'PUT',
-            body: JSON.stringify({stock: newStock})
+            body: JSON.stringify({stock: newStock}),
+            headers: {'Content-Type': 'application/json'}
           }).then(res => res.json())
           .catch(err => alert("Ha habido un error al buscar los productos!"))
         }

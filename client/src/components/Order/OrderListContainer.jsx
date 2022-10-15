@@ -1,9 +1,11 @@
-import { collection, getFirestore, onSnapshot, query, where } from 'firebase/firestore';
 import { auth } from '../../firebase/config';
+import io from 'socket.io-client';
 import React, { useEffect, useState } from 'react'
 import OrderList from './OrderList';
 import styles from './order.module.css';
 import StockList from '../StockList/StockList';
+
+const socket = io('http://localhost:8080')
 
 export default function OrderListContainer() {
     const [orders, setOrders] = useState([]);
@@ -13,8 +15,6 @@ export default function OrderListContainer() {
     const [loading, setLoading] = useState(true);
     const [authentication, setAuthentication] = useState(false);
     const [authBtnTag, setAuthBtnTag] = useState('Ingresar');
-
-    const db = getFirestore();
 
     const authenticateUser = async () => { 
         setAuthBtnTag('Cargando...')
@@ -36,12 +36,14 @@ export default function OrderListContainer() {
     const preventDefault = (i) => { i.preventDefault()}    
 
     useEffect(() => {
-        const queryCollection = collection(db, 'orders');
         // The onSnapshot method allows for real time updates from the firestore database
         try{
-            onSnapshot(queryCollection, 
-            (querySnapshot) => {
-            setOrders(querySnapshot.docs.map(i => ( { id: i.id, ...i.data() } )))
+            fetch(`http://localhost:8080/api/cart`, {
+                method: 'GET'
+              }).then(res => res.json())
+              .then(res => {
+            console.log(res)
+            setOrders(res);
             }
         )}
         catch(err){
@@ -50,26 +52,25 @@ export default function OrderListContainer() {
         finally{
             setLoading(false)
         }
-    },[db]);
+    },[]);
 
     useEffect(() => {
-        const queryCollection = query(collection(db, 'items'), where('cat', '!=', 'servicios'));
-        try{
-            onSnapshot(queryCollection, 
-            (querySnapshot) => {
-            setItems(querySnapshot.docs.map(i => ( { id: i.id, ...i.data() } )))
-            })
-        }
-        catch(err){
-            alert("Ha habido un error al buscar los items!")
-        }
-        finally{
-            setLoading(false)
-        }
-    },[db]);
+        socket.on('products', data => {
+            try{
+                setItems(data.filter(j => {return j.cat != 'servicios'}).sort((a,b) => (((a.price > b.price) ? 1 : (a.price < b.price) ? -1 : 0)) ));
+                setLoading(false); 
+            }
+            catch(err){
+                alert("Ha habido un error al buscar los items!")
+            }
+            finally{
+                setLoading(false)
+            }
+        })
+    },[items]);
 
     return (
-        <>{authentication ?
+        <>{!authentication ?
             <div className='container'>
                 <h1>Órdenes:</h1>
                 <div><OrderList loadingState={loading} orders={orders} /></div>
