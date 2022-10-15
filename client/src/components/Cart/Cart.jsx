@@ -81,8 +81,17 @@ export default function Cart() {
         body: {products: querySnapshot},
         headers: {'Content-Type': 'application/json'}
       }).then(res => res.json())
-      .then(docRef => {
-        setOrderId(docRef.id);
+      .then(async res => {
+        for (let i in querySnapshot){
+          await fetch(`http://localhost:8080/api/cart/${res}/products/${i.id}`, {
+            method: 'POST',
+            body: {...querySnapshot.filter(j => j.id == i.id)},
+            headers: {'Content-Type': 'application/json'}
+          })
+        }
+      })
+      .then(res => {
+        setOrderId(res);
       })
       .catch(error => console.error("Error adding document: ", error))
       
@@ -97,7 +106,7 @@ export default function Cart() {
           let newStock = i.stock - itemInOrder.quantity
           fetch(`http://localhost:8080/api/products/${i.id}`, {
             method: 'PUT',
-            body: JSON.stringify({stock: newStock}),
+            body: {stock: newStock},
             headers: {'Content-Type': 'application/json'}
           }).then(res => res.json())
           .catch(err => alert("Ha habido un error al buscar los productos!"))
