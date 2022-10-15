@@ -29,7 +29,6 @@ export default function Cart() {
         .then(res => querySnapshotArray.push(res))
         .catch(err => alert("Ha habido un error al buscar los productos!"))
       } 
-      console.log(querySnapshotArray)
       for (let docum of querySnapshotArray) {
         let [itemInCart] = cartList.filter(i => i.id === docum.id)
         if (itemInCart.quantity > docum.stock) {
@@ -90,12 +89,12 @@ export default function Cart() {
 
       //Stock update
 
-      querySnapshot.forEach((docum) => {
-        let itemInOrder = querySnapshot.filter(i => i.id === docum.id)
+      querySnapshot.forEach((i) => {
+        let itemInOrder = cartList.filter(i => i.id === i.id)
         //Update stock unless it is a service
-        if (docum.cat !== 'servicios'){
-          let newStock = docum.stock - itemInOrder.quantity
-          fetch(`http://localhost:8080/api/products/${docum.id}`, {
+        if (i.cat !== 'servicios' || !i.cat){
+          let newStock = i.stock - itemInOrder.quantity
+          fetch(`http://localhost:8080/api/products/${i.id}`, {
             method: 'PUT',
             body: JSON.stringify({stock: newStock})
           }).then(res => res.json())

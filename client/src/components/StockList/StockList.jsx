@@ -1,18 +1,15 @@
-import { updateDoc, getFirestore, doc } from 'firebase/firestore';
 import React from 'react'
 import styles from '../Order/order.module.css';
 import StockCount from './StockCount';
 
 export default function StockList(props) {
-    const db = getFirestore();
 
     const changeStock = async (newStock, id) => {
         //Stock update
-        const itemRef = doc(db, 'items', id);
-
-        await updateDoc(itemRef, {
-            stock: newStock
-        })
+        await fetch(`http://localhost:8080/api/products/${id}`, {
+            method:'PUT',
+            body:JSON.stringify({stock: newStock})
+    })
         .then(alert('Stock actualizado!'))
         .catch(err => alert('Hubo un error al actualizar el stock'))
     }
