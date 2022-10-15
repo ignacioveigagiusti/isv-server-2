@@ -18,7 +18,7 @@ export default {
 
    output: {
        path: path.resolve(__dirname, 'dist'),
-       filename: '[name].cjs',
+       filename: '[name].js',
        clean: true,
        library: {
         type: "umd",
