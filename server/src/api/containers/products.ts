@@ -1,25 +1,6 @@
 import fs from 'fs';
 
-interface Cartface {
-    id: number,
-    timestamp: string,
-    products: CartProd[]
-}
-
-interface CartProd {
-    id: number,
-    timestamp: string,
-    stock: number,
-    cat: string,
-    description: string,
-    price: number,
-    name: string,
-    thumbnail: string,
-    category: string,
-    quantity: number
-}
-
-class Cart {
+class Products {
     
     fileToWork: string;
 
@@ -27,7 +8,7 @@ class Cart {
         this.fileToWork = fileToWork
     }
     
-    async save(cart) {
+    async save(product) {
         try{
             let getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf8');
             if (getContent == '') {
@@ -40,31 +21,31 @@ class Cart {
                 indexArray.push(prevContent[i].id);
             }
             // By default, the new ID is the number of current IDs + 1
-            let newID: number = indexArray.length + 1;
+            let newID = indexArray.length + 1;
             // Search for a missing ID in the ID Array. If a gap is found, the new ID will be set to that number
             if (indexArray.length > 0) {
                 indexArray = indexArray.sort((a: any,b: any) => a - b )
                 for (let i = 0; i < indexArray.length; i++) {
-                    if ((indexArray[i] - i) != 1){
+                    if ( (indexArray[i] - i) != 1){
                         newID = i+1;
                         break
                     }
                 }
             }
-            const newCart : Cartface = {id: newID, ...cart};
+            const newProduct = {id: newID, ...product};
             let newContent = prevContent
-            newContent.push(newCart);
-            await newContent.sort((a: { id: number; },b: { id: number; }) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
+            newContent.push(newProduct);
+            await newContent.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
             await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(newContent,null,2));
-            console.log('Succesful write!');
-            return newCart.id;
+            console.log('Escritura exitosa!');
+            return newProduct;
         }
         catch(err){
             throw new Error(`${err}`)
         }
     }
 
-    async edit(cartID: number, cart) {
+    async edit(productId, product) {
         try{
             let getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf8');
             if (getContent == '') {
@@ -74,23 +55,23 @@ class Cart {
             // Variable to check if the ID exists in the list
             let IDwasFound = 0;
             for (const i in prevContent) {
-                if (prevContent[i].id == cartID) {
+                if (prevContent[i].id == productId) {
                     IDwasFound = 1;
-                    prevContent[i] = {id: cartID, ...cart};
+                    prevContent[i] = { id: parseInt(productId), ...product};
                 }
             }
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID was not found';
             await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(prevContent,null,2));
-            console.log('Succesful write!');
-            return cart;
+            console.log('Escritura exitosa!');
+            return { id: parseInt(productId), ...product}
         }
         catch(err){
-            throw new Error(`${err}`);
+            throw new Error(`${err}`)
         }
     }
 
-    async getById(num: number) {
+    async getById(num) {
         try{
             const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf8');
             const content = JSON.parse(getContent); 
@@ -121,7 +102,7 @@ class Cart {
         }
     }
 
-    async deleteById(num: number) {
+    async deleteById(num) {
         try{
             const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf-8');
             const prevContent = JSON.parse(getContent); 
@@ -141,7 +122,7 @@ class Cart {
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID does not exist!';
             await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(newContent,null,2))
-            console.log('Succesful write!')
+            console.log('Escritura exitosa!')
         }
         catch(err){
             throw new Error(`${err}`)
@@ -151,13 +132,11 @@ class Cart {
     async deleteAll() {
         try {
             await fs.promises.writeFile(`${this.fileToWork}`, '[]')
-            console.log('Succesful write!')
+            console.log('Escritura exitosa!')
         } catch (err) {
             throw new Error(`${err}`) 
         }
     }
-
-    
 }
 
-export default Cart;
+export default Products;
