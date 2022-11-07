@@ -1,21 +1,29 @@
 class FirebaseContainer {
     
-    knex
-    tableName
+    admin
+    serviceAccount
+    db
+    productCollection: string
+    cartCollection: string
 
-    constructor(options, tableName){
-        this.knex = require('knex')(options);
-        this.tableName = tableName;
+    constructor(SAKey: string, productCollection: string, cartCollection: string){
+        this.admin = require('firebase-admin');
+        this.serviceAccount = require(SAKey);
+        this.admin.initializeApp({
+            credential: this.admin.credential.cert(this.serviceAccount)
+        });
+        this.db = this.admin.firestore();
+        this.productCollection = productCollection   
+        this.cartCollection = cartCollection
     }
 
 
     async save(product) {
         try{
-            let getContent:any[] = [];
-            await this.knex(this.tableName).select("*").then((rows) => {
-                let rowsarr = rows;
-                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
-            });
+            const query = await this.db.collection(this.productCollection);
+            const querySnapshot = await query.get();
+            let docs = querySnapshot.docs;
+            let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
             const prevContent = getContent; 
             // Extract IDs into an array
             let indexArray:any[] = [];
@@ -36,7 +44,8 @@ class FirebaseContainer {
             }
             const newProduct = {id: newID, timestamp: String(new Date()).slice(0,33), ...product};
             //KNEX
-            await this.knex(this.tableName).insert(newProduct);
+            let doc = query.doc()
+            await doc.create(newProduct);
             console.log('Escritura exitosa!');
             
             return newProduct;
@@ -48,11 +57,10 @@ class FirebaseContainer {
 
     async edit(productId, product) {
         try{
-            let getContent:any[] = [];
-            await this.knex(this.tableName).select("*").then((rows) => {
-                let rowsarr = rows;
-                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
-            });
+            const query = await this.db.collection(this.productCollection);
+            const querySnapshot = await query.get();
+            let docs = querySnapshot.docs;
+            let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
             let prevContent = getContent;
             // Variable to check if the ID exists in the list
             let IDwasFound = 0;
@@ -65,7 +73,8 @@ class FirebaseContainer {
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID was not found';
             //KNEX
-            await this.knex(this.tableName).where({id:productId}).update({...product});
+            const docQuery = await this.db.collection(this.productCollection).where('id', '==', `${productId}`).get()
+            await docQuery.update({...product});
             console.log('Escritura exitosa!');
             
             return { id: parseInt(productId), ...product}
@@ -77,11 +86,10 @@ class FirebaseContainer {
 
     async getById(num) {
         try{
-            let getContent:any[] = [];
-            await this.knex(this.tableName).select("*").then((rows) => {
-                let rowsarr = rows;
-                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
-            });
+            const query = await this.db.collection(this.productCollection);
+            const querySnapshot = await query.get();
+            let docs = querySnapshot.docs;
+            let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
             const content = getContent; 
             // Variable to check if the ID exists in the list
             let IDwasFound = 0;
@@ -102,11 +110,10 @@ class FirebaseContainer {
 
     async getAll() {
         try{
-            let getContent:any[] = [];
-            await this.knex(this.tableName).select("*").then((rows) => {
-                let rowsarr = rows;
-                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
-            });
+            const query = await this.db.collection(this.productCollection);
+            const querySnapshot = await query.get();
+            let docs = querySnapshot.docs;
+            let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
             // const content = JSON.parse(getContent); 
             
             return getContent
@@ -118,11 +125,10 @@ class FirebaseContainer {
 
     async deleteById(num) {
         try{
-            let getContent:any[] = [];
-            await this.knex(this.tableName).select("*").then((rows) => {
-                let rowsarr = rows;
-                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
-            });
+            const query = await this.db.collection(this.productCollection);
+            const querySnapshot = await query.get();
+            let docs = querySnapshot.docs;
+            let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
             const prevContent = getContent; 
             const newContent:any[] = [];
             // Variable to check if the ID exists in the list
@@ -139,9 +145,9 @@ class FirebaseContainer {
             }
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID does not exist!';
-            await this.knex(this.tableName).where('id', '=', num).del();
+            const docQuery = await this.db.collection(this.productCollection).where('id', '==', `${num}`).get()
+            await docQuery.delete();
             console.log('Escritura exitosa!');
-            
         }
         catch(err){
             throw new Error(`${err}`)
@@ -150,7 +156,10 @@ class FirebaseContainer {
 
     async deleteAll() {
         try {
-            await this.knex(this.tableName).del();
+            const query = await this.db.collection(this.productCollection);
+            const querySnapshot = await query.get();
+            let docs = querySnapshot.docs;
+            await docs.delete()
             console.log('Escritura exitosa!')
             
         } catch (err) {
