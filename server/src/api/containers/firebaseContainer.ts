@@ -3,24 +3,22 @@ class FirebaseContainer {
     admin
     serviceAccount
     db
-    productCollection: string
-    cartCollection: string
+    collection: string
 
-    constructor(SAKey: string, productCollection: string, cartCollection: string){
+    constructor(SAKey, collection: string){
         this.admin = require('firebase-admin');
         this.serviceAccount = require(SAKey);
         this.admin.initializeApp({
             credential: this.admin.credential.cert(this.serviceAccount)
         });
         this.db = this.admin.firestore();
-        this.productCollection = productCollection   
-        this.cartCollection = cartCollection
+        this.collection = collection   
     }
 
 
     async save(product) {
         try{
-            const query = await this.db.collection(this.productCollection);
+            const query = await this.db.collection(this.collection);
             const querySnapshot = await query.get();
             let docs = querySnapshot.docs;
             let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
@@ -57,7 +55,7 @@ class FirebaseContainer {
 
     async edit(productId, product) {
         try{
-            const query = await this.db.collection(this.productCollection);
+            const query = await this.db.collection(this.collection);
             const querySnapshot = await query.get();
             let docs = querySnapshot.docs;
             let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
@@ -73,7 +71,7 @@ class FirebaseContainer {
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID was not found';
             //KNEX
-            const docQuery = await this.db.collection(this.productCollection).where('id', '==', `${productId}`).get()
+            const docQuery = await this.db.collection(this.collection).where('id', '==', `${productId}`).get()
             await docQuery.update({...product});
             console.log('Escritura exitosa!');
             
@@ -86,7 +84,7 @@ class FirebaseContainer {
 
     async getById(num) {
         try{
-            const query = await this.db.collection(this.productCollection);
+            const query = await this.db.collection(this.collection);
             const querySnapshot = await query.get();
             let docs = querySnapshot.docs;
             let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
@@ -110,7 +108,7 @@ class FirebaseContainer {
 
     async getAll() {
         try{
-            const query = await this.db.collection(this.productCollection);
+            const query = await this.db.collection(this.collection);
             const querySnapshot = await query.get();
             let docs = querySnapshot.docs;
             let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
@@ -125,7 +123,7 @@ class FirebaseContainer {
 
     async deleteById(num) {
         try{
-            const query = await this.db.collection(this.productCollection);
+            const query = await this.db.collection(this.collection);
             const querySnapshot = await query.get();
             let docs = querySnapshot.docs;
             let getContent:any[] = await docs.map(doc => ( doc.data() ) ).sort((a,b) => (((a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0)) );
@@ -145,7 +143,7 @@ class FirebaseContainer {
             }
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID does not exist!';
-            const docQuery = await this.db.collection(this.productCollection).where('id', '==', `${num}`).get()
+            const docQuery = await this.db.collection(this.collection).where('id', '==', `${num}`).get()
             await docQuery.delete();
             console.log('Escritura exitosa!');
         }
@@ -156,7 +154,7 @@ class FirebaseContainer {
 
     async deleteAll() {
         try {
-            const query = await this.db.collection(this.productCollection);
+            const query = await this.db.collection(this.collection);
             const querySnapshot = await query.get();
             let docs = querySnapshot.docs;
             await docs.delete()

@@ -17,10 +17,8 @@ app.use(cors())
 const productRouter = Router();
 const cartRouter = Router();
 
-import Products from './api/containers/products';
-import Cart from './api/containers/cart';
-const productContainer = new Products('./api/products.json');
-const cartContainer = new Cart('./api/carts.json');
+import {productModule as productContainer} from './api/daos/index';
+import {cartModule as cartContainer} from './api/daos/index';
 
 let admin : boolean = true;
 

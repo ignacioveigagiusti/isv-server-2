@@ -12,7 +12,7 @@ const cartSchema = new mongoose.Schema({
 
 class CartMongoDao extends MongoContainer{
     constructor(){
-        super('mongodb+srv://nachtrent:Trent170995@cluster0.thr5h.mongodb.net/?retryWrites=true&w=majority', cartCollection, cartSchema)
+        super(process.env.MONGODB_URL? process.env.MONGODB_URL : '', cartCollection, cartSchema)
     }
 }
 

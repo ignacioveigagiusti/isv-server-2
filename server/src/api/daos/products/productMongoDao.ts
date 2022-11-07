@@ -17,7 +17,7 @@ const productSchema = new mongoose.Schema({
 
 class ProductMongoDao extends MongoContainer{
     constructor(){
-        super('mongodb+srv://nachtrent:Trent170995@cluster0.thr5h.mongodb.net/?retryWrites=true&w=majority',productCollection,productSchema)
+        super(process.env.MONGODB_URL? process.env.MONGODB_URL : '',productCollection,productSchema)
     }
 }
 
