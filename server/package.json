@@ -1,0 +1,42 @@
+{
+  "dependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.9",
+    "@babel/preset-env": "^7.16.11",
+    "@types/express": "^4.17.13",
+    "express": "^4.17.3",
+    "express-handlebars": "^5.3.0",
+    "he": "^1.2.0",
+    "method-override": "^3.0.0",
+    "pug": "^3.0.2",
+    "socket.io": "^4.4.1"
+  },
+  "name": "isv-server",
+  "version": "1.0.0",
+  "main": "dist/isvserver.cjs",
+  "type": "module",
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/isvserver.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignacioveigagiusti/isv-server.git"
+  },
+  "author": "Ignacio Veiga",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ignacioveigagiusti/isv-server/issues"
+  },
+  "homepage": "https://github.com/ignacioveigagiusti/isv-server#readme",
+  "description": "",
+  "devDependencies": {
+    "copy-webpack-plugin": "^10.2.4",
+    "ts-loader": "^9.2.8",
+    "typescript": "^4.6.3",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-node-externals": "^3.0.0"
+  }
+}

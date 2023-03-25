@@ -1,0 +1,18 @@
+.search {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+}
+
+.navBarContainer {
+    display: flex;
+    justify-content: space-between;
+    flex-flow: row;
+    background-color: #f8f9fa ;
+    height: min-content;
+}
+
+.cartWidget{
+    align-self: center;
+    justify-self: flex-end;
+}

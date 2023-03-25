@@ -1,0 +1,21 @@
+.cartWidget{
+    margin: 0 0.5rem;
+    display: flex;
+}
+
+/* .idleCartWidget{
+    margin: 0 0.5rem;
+    display: none;
+} */
+
+.cartQuantity{
+    background-color: cornflowerblue;
+    border-radius: 50%;
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 1.25rem;
+    position: absolute;
+    right: 3rem;
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+}
