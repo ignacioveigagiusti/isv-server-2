@@ -12,7 +12,7 @@ export default function CartContextProvider({ children }) {
     function addToCart(item){
         // Nested conditional to increase the quantity if the item is already in the cartList and stock hasn't been depleted yet
         if (findDuplicate(item)){
-            if (cartList.find( ({id}) => id === item.id).quantity < item.stock){
+            if ((cartList.find( ({id}) => id === item.id).quantity + item.quantity) <= item.stock){
                 cartList.find( ({id}) => id === item.id).quantity += item.quantity;
                 setTotalQuantity(quantitySum());
             }

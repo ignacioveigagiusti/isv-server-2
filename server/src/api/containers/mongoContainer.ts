@@ -1,42 +1,40 @@
-import fs from 'fs';
+import mongoose from "mongoose";
+import mongoConnection from "../options/mongoConnection";
 
-interface Prod {
-    id: number,
-    timestamp: string,
-    stock: number,
-    cat: string,
-    description: string,
-    price: number,
-    name: string,
-    thumbnail: string,
-    category: string
-}
+class MongoContainer {
 
-class Products {
-    
-    fileToWork: string;
+    model
 
-    constructor(fileToWork){
-        this.fileToWork = fileToWork
+    constructor(mongoURL: string, model: string, schema){
+        try{
+            mongoConnection(mongoURL);
+        }
+        catch(err){
+            throw err
+        }
+        this.model = mongoose.model(model, schema)
     }
-    
+
+
+
     async save(product) {
         try{
-            let getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf8');
-            if (getContent == '') {
-                getContent = '[]';
-            }
-            const prevContent = JSON.parse(getContent); 
+            let getContent:any[] = [];
+            await this.model.select("*").then((rows) => {
+                let rowsarr = rows;
+                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
+            });
+            const prevContent = getContent; 
             // Extract IDs into an array
-            let indexArray: number[] = [];
+            let indexArray:any[] = [];
             for (const i in prevContent) {
                 indexArray.push(prevContent[i].id);
             }
             // By default, the new ID is the number of current IDs + 1
-            let newID: number = indexArray.length + 1;
+            let newID = indexArray.length + 1;
             // Search for a missing ID in the ID Array. If a gap is found, the new ID will be set to that number
             if (indexArray.length > 0) {
-                indexArray = indexArray.sort((a: any,b: any) => a - b )
+                indexArray = indexArray.sort((a,b) => a - b )
                 for (let i = 0; i < indexArray.length; i++) {
                     if ( (indexArray[i] - i) != 1){
                         newID = i+1;
@@ -44,12 +42,11 @@ class Products {
                     }
                 }
             }
-            const newProduct: Prod = {id: newID, ...product};
-            let newContent = prevContent
-            newContent.push(newProduct);
-            await newContent.sort((a: { id: number; },b: { id: number; }) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
-            await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(newContent,null,2));
+            const newProduct = {id: newID, timestamp: String(new Date()).slice(0,33), ...product};
+            //model
+            await this.model.insert(newProduct);
             console.log('Escritura exitosa!');
+            
             return newProduct;
         }
         catch(err){
@@ -57,41 +54,49 @@ class Products {
         }
     }
 
-    async edit(productId: number, product) {
+    async edit(productId, product) {
         try{
-            let getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf8');
-            if (getContent == '') {
-                getContent = '[]';
-            }
-            let prevContent = JSON.parse(getContent);
+            let getContent:any[] = [];
+            await this.model.select("*").then((rows) => {
+                let rowsarr = rows;
+                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
+            });
+            let prevContent = getContent;
             // Variable to check if the ID exists in the list
             let IDwasFound = 0;
             for (const i in prevContent) {
                 if (prevContent[i].id == productId) {
                     IDwasFound = 1;
-                    prevContent[i] = { id: productId, ...product};
+                    prevContent[i] = { id: parseInt(productId), ...product};
                 }
             }
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID was not found';
-            await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(prevContent,null,2));
+            //model
+            await this.model.where({id:productId}).update({...product});
             console.log('Escritura exitosa!');
-            return { id: productId.toString(), ...product}
+            
+            return { id: parseInt(productId), ...product}
         }
         catch(err){
             throw new Error(`${err}`)
         }
     }
 
-    async getById(num: number) {
+    async getById(num) {
         try{
-            const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf8');
-            const content = JSON.parse(getContent); 
+            let getContent:any[] = [];
+            await this.model.select("*").then((rows) => {
+                let rowsarr = rows;
+                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
+            });
+            const content = getContent; 
             // Variable to check if the ID exists in the list
             let IDwasFound = 0;
             for (const i in content) {
                 if (content[i].id == num) {
                     IDwasFound = 1;
+                    
                     return content[i]
                 }
             }
@@ -105,20 +110,29 @@ class Products {
 
     async getAll() {
         try{
-            const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf-8');
-            const content = JSON.parse(getContent); 
-            return content
+            let getContent:any[] = [];
+            await this.model.select("*").then((rows) => {
+                let rowsarr = rows;
+                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
+            });
+            // const content = JSON.parse(getContent); 
+            
+            return getContent
         }
         catch(err){
             throw new Error(`${err}`)
         }
     }
 
-    async deleteById(num: number) {
+    async deleteById(num) {
         try{
-            const getContent = await fs.promises.readFile(`${this.fileToWork}`, 'utf-8');
-            const prevContent = JSON.parse(getContent); 
-            const newContent: any[] = [];
+            let getContent:any[] = [];
+            await this.model.select("*").then((rows) => {
+                let rowsarr = rows;
+                rowsarr.map(row => getContent.push(JSON.parse(JSON.stringify(row))));
+            });
+            const prevContent = getContent; 
+            const newContent:any[] = [];
             // Variable to check if the ID exists in the list
             let IDwasFound = 0;
             for (let i = 0; i < prevContent.length; i++) {
@@ -133,8 +147,9 @@ class Products {
             }
             // Throw error if ID was not found
             if (IDwasFound == 0) throw 'ID does not exist!';
-            await fs.promises.writeFile(`${this.fileToWork}`, JSON.stringify(newContent,null,2))
-            console.log('Escritura exitosa!')
+            await this.model.where('id', '=', num).del();
+            console.log('Escritura exitosa!');
+            
         }
         catch(err){
             throw new Error(`${err}`)
@@ -143,12 +158,13 @@ class Products {
 
     async deleteAll() {
         try {
-            await fs.promises.writeFile(`${this.fileToWork}`, '[]')
+            await this.model.del();
             console.log('Escritura exitosa!')
+            
         } catch (err) {
             throw new Error(`${err}`) 
         }
     }
 }
 
-export default Products;
+export default MongoContainer;

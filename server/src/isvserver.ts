@@ -17,10 +17,8 @@ app.use(cors())
 const productRouter = Router();
 const cartRouter = Router();
 
-import Products from './api/products';
-import Cart from './api/cart';
-const productContainer = new Products('./api/products.json');
-const cartContainer = new Cart('./api/carts.json');
+import {productModule as productContainer} from './api/daos/index';
+import {cartModule as cartContainer} from './api/daos/index';
 
 let admin : boolean = true;
 
@@ -279,7 +277,7 @@ cartRouter.post('/:id/products/:prod_id', async (req, res) => {
         let product = await productContainer.getById(prodID);
         let quantity: number = req.body.quantity || 1;
         cart.products.push({...product, quantity: quantity}); // TO DO: Implement function that looks for existing products and modifies quantities in cart instead of adding new ones.
-        let editedCart = await cartContainer.edit(cartID, cart);
+        let editedCart = await cartContainer.edit(cart);
         res.json(editedCart);
     } catch (err) {
         res.status(400).send(`${err}`);
@@ -295,7 +293,7 @@ cartRouter.delete('/:id/products/:prod_id', async (req, res) => {
         let removeIndex = cart.products.map(product => product.id).indexOf(prodID);
         if ( removeIndex < 0) throw 'Product not found in cart'
         ~removeIndex && cart.products.splice(removeIndex, 1);
-        let editedCart = await cartContainer.edit(cartID, cart);
+        let editedCart = await cartContainer.edit(cart);
         res.json(editedCart);
     } catch (err) {
         res.status(404).send(`${err}`);
