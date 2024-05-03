@@ -100,7 +100,7 @@ export default function Cart() {
       //Stock update
 
       querySnapshot.forEach((i) => {
-        let itemInOrder = cartList.filter(j => j.id === i.id)
+        let itemInOrder = cartList.filter(i => i.id === i.id)
         //Update stock unless it is a service
         if (i.cat !== 'servicios' || !i.cat){
           let newStock = i.stock - itemInOrder.quantity
