@@ -14,6 +14,10 @@ const io = new IOServer(httpServer, {
 });
 app.use(cors())
 
+// This server will use handlebars for templating
+import handlebars from 'express-handlebars';
+import hbs from 'handlebars';
+
 const productRouter = Router();
 const cartRouter = Router();
 
@@ -35,6 +39,126 @@ productRouter.use(express.json());
 productRouter.use(express.urlencoded({ extended: false }));
 cartRouter.use(express.json());
 cartRouter.use(express.urlencoded({ extended: false }));
+
+// Handlebars settings
+app.engine('hbs', 
+    handlebars({
+        extname: '.hbs',
+        defaultLayout: 'index.hbs',
+        layoutsDir: __dirname + '/views/layouts',
+        partialsDir: __dirname + 'views/partials/'
+    })
+);
+const head = hbs.compile(fs.readFileSync(__dirname + '/views/partials/head.hbs').toString('utf-8'));
+hbs.registerPartial('head', head)
+const header = hbs.compile(fs.readFileSync(__dirname + '/views/partials/header.hbs').toString('utf-8'));
+hbs.registerPartial('header', header)
+const footer = hbs.compile(fs.readFileSync(__dirname + '/views/partials/footer.hbs').toString('utf-8'));
+hbs.registerPartial('footer', footer)
+const indexForms = hbs.compile(fs.readFileSync(__dirname + '/views/partials/indexForms.hbs').toString('utf-8'));
+hbs.registerPartial('indexForms', indexForms)
+const productTable = hbs.compile(fs.readFileSync(__dirname + '/views/partials/productTable.hbs').toString('utf-8'));
+hbs.registerPartial('productTable', productTable)
+app.set('view engine', 'hbs');
+app.set('views', './views');
+app.use(express.static('public'));
+
+// TEMPLATE VIEW
+
+// main is sent when performing a get on the root directory
+app.get('/', (req, res) => {
+    res.render('main');
+})
+
+// Add an item with the index form
+app.post('/',isAdmin , async (req, res) => {    
+    try {
+        if( req.body.name == undefined || req.body.price === null || req.body.thumbnail == undefined || req.body.category == undefined || req.body.stock == null || req.body.name == '' || req.body.price === '' || req.body.thumbnail == '' || req.body.category == '' || req.body.stock == '' ) {
+            throw 'Missing data. Product needs name, Price, Thumbnail, Category and Stock.'
+        }
+        let category = req.body.category;
+        let subcategory = req.body.subcategory || ' ';
+        let name = req.body.name;
+        let description = req.body.description || ' ';
+        let price = req.body.price;
+        let stock = req.body.stock;
+        let thumbnail = req.body.thumbnail;
+        price = parseFloat(price);
+        stock = parseFloat(stock);
+        const newProduct = {category:category, subcategory:subcategory, name:name, description:description, price:price, stock:stock, thumbnail:thumbnail};
+        const savedProduct = await productContainer.save(newProduct);
+        res.render('main', {addedProduct: JSON.stringify(savedProduct), successfulAdd: true});
+    } catch (err) {
+        res.status(400).send(err);
+    }
+})
+
+// Edit an item with the index form
+app.post('/edit',isAdmin, async (req, res) => {
+    try {
+        let putId;
+        if (req.body.id != null && req.body.id !== '') {
+            putId = req.body.id;
+        }
+        else{
+            throw 'No ID was provided';
+        }
+        const prevProduct = await productContainer.getById(putId);
+        let newTimestamp = String(new Date()).slice(0,33);
+        let newCategory = prevProduct.category;
+        let newCat = prevProduct.cat;
+        let newSubcategory = prevProduct.subcategory || '';
+        let newName = prevProduct.name;
+        let newDescription = prevProduct.description || '';
+        let newPrice = prevProduct.price;
+        let newStock = prevProduct.stock;
+        let newThumbnail = prevProduct.thumbnail;
+        if (typeof req.body.timestamp === 'string' && req.body.timestamp !== '') {
+            newTimestamp = req.body.timestamp;
+        }
+        if (typeof req.body.category === 'string' && req.body.category !== '') {
+            newCategory = req.body.category;
+        }
+        if (typeof req.body.subcategory === 'string' && req.body.subcategory !== '') {
+            newSubcategory = req.body.subcategory;
+        }
+        if (typeof req.body.cat === 'string' && req.body.cat !== '') {
+            newCat = req.body.cat;
+        }
+        if (typeof req.body.name === 'string' && req.body.name !== '') {
+            newName = req.body.name;
+        }
+        if (typeof req.body.description === 'string' && req.body.description !== '') {
+            newDescription = req.body.description;
+        }
+        if (!isNaN(req.body.price) && req.body.price && req.body.price !== '') {
+            newPrice = parseFloat(req.body.price);
+        }
+        if (!isNaN(req.body.stock) && req.body.stock && req.body.stock !== '') {
+            newStock = parseInt(req.body.stock);
+        }    
+        if (typeof req.body.thumbnail === 'string' && req.body.thumbnail !== '') {   
+            newThumbnail = req.body.thumbnail;
+        }
+        const newProduct = {timestamp:newTimestamp, category:newCategory, subcategory:newSubcategory, name:newName, description:newDescription, price:newPrice, stock:newStock, thumbnail:newThumbnail, cat:newCat};
+        const editProduct = await productContainer.edit(putId, newProduct).catch((err) => {
+            throw err
+        });
+        res.render('main', {successfulEdit: true, editedProduct: JSON.stringify(editProduct, null, 2)});
+    } catch (err) {
+        res.render('main', {unsuccessfulEdit: true, editError: err});
+    }
+});
+
+app.get('/products', async (req, res) => {
+    let allProducts = []
+    try {
+        allProducts = await productContainer.getAll();
+    } catch (err) {
+        res.send(`${err}`);
+    }
+    res.render('main', {layout: 'products.hbs', productList: allProducts});
+})
 
 // PRODUCTS
 
